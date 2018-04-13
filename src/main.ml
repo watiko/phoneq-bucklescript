@@ -1,28 +1,51 @@
-(* This line opens the Tea.App modules into the current scope for Program access functions and types *)
-open Tea.App
-
-(* This opens the Elm-style virtual-dom functions and types into the current scope *)
+open Tea
 open Tea.Html
 
-(* Let's create a new type here to be our main message type that is passed around *)
+type route =
+  | Home
+  | SpeakingQuiz
+  | DictationQuiz
+  | Settings
+
+type model =
+  { route: route
+  }
+
 type msg =
-  | Increment  (* This will be our message to increment the counter *)
-  | Decrement  (* This will be our message to decrement the counter *)
-  | Reset      (* This will be our message to reset the counter to 0 *)
-  | Set of int (* This will be out message to set the counter to a specific value *)
-  [@@bs.deriving {accessors}] (* This is a nice quality-of-life addon from Bucklescript, it will generate function names for each constructor name, optional, but nice to cut down on code, this is unused in this example but good to have regardless *)
+  | LocationChanged of Web.Location.location
+  [@@bs.deriving accessors]
+ 
+let route_of_location location =
+  let route = Js.String.split "/" location.Web.Location.hash in
+  match route with
+  | [|"#!"; ""|]               -> Home
+  | [|"#!"; "speaking-quiz"|]  -> SpeakingQuiz
+  | [|"#!"; "dictation-quiz"|] -> DictationQuiz
+  | [|"#!"; "settings"|]       -> Settings      
+  | _                          -> Home
 
-(* This is optional for such a simple example, but it is good to have an `init` function to define your initial model default values, the model for Counter is just an integer *)
-let init () = 4
+let location_of_route = function
+  | Home          -> "#!/"
+  | SpeakingQuiz  -> "#!/speaking-quiz"
+  | DictationQuiz -> "#!/dictation-quiz"
+  | Settings      -> "#!/settings"
 
-(* This is the central message handler, it takes the model as the first argument *)
-let update model = function (* These should be simple enough to be self-explanatory, mutate the model based on the message, easy to read and follow *)
-  | Increment -> model + 1
-  | Decrement -> model - 1
-  | Reset -> 0
-  | Set v -> v
+external alert : (string -> unit) = "alert" [@@bs.val]
 
-(* This is just a helper function for the view, a simple function that returns a button based on some argument *)
+let init_model =
+  { route = Home
+  }
+
+let update_route model = function
+  | route when model.route = route -> model, Cmd.none
+  | route -> model, location_of_route route |> Navigation.newUrl
+
+let update model = function
+  | LocationChanged l -> { model with route = route_of_location l }, Cmd.none
+
+let init () location =
+  route_of_location location |> update_route init_model
+
 let view_button title msg =
   button
     [ onClick msg
@@ -30,33 +53,53 @@ let view_button title msg =
     [ text title
     ]
 
-(* This is the main callback to generate the virtual-dom.
-  This returns a virtual-dom node that becomes the view, only changes from call-to-call are set on the real DOM for efficiency, this is also only called once per frame even with many messages sent in within that frame, otherwise does nothing *)
+let home_link = a [href "#!/"] [text "Home"]
+let speaking_link = a [href "#!/speaking-quiz"] [text "Speking Quiz"]
+let dictation_link = a [href "#!/dictation-quiz"] [text "Dictation Quiz"]
+let settings_link = a [href "#!/settings"] [text "Settings"]
+
+let home_view =
+  let open! Html in
+  let item link = li [] [link] in
+  nav []
+    [ ul [] [ item home_link
+            ; item speaking_link
+            ; item dictation_link
+            ; item settings_link
+            ]] 
+
+let speaking_view =
+  let open! Html in
+  home_link
+
+let dictation_view =
+  let open! Html in
+  home_link
+
+let settings_view =
+  let open! Html in
+  home_link
+
+let routing_view model =
+  let open! Html in
+  let nodes = match model.route with
+           | Home -> [text "home"; home_view]
+           | SpeakingQuiz -> [text "speaking"; speaking_view]
+           | DictationQuiz -> [text "dictation"; dictation_view]
+           | Settings -> [text "settings"; settings_view]
+  in main [] nodes
+
 let view model =
   div
     []
-    [ span
-        [ style "text-weight" "bold" ]
-        [ text (string_of_int model) ]
-    ; br []
-    ; view_button "Increment" Increment
-    ; br []
-    ; view_button "Decrement" Decrement
-    ; br []
-    ; view_button "Set to 42" (Set 42)
-    ; br []
-    ; if model <> 0 then view_button "Reset" Reset else noNode
+    [ routing_view model
     ]
 
-(* This is the main function, it can be named anything you want but `main` is traditional.
-  The Program returned here has a set of callbacks that can easily be called from
-  Bucklescript or from javascript for running this main attached to an element,
-  or even to pass a message into the event loop.  You can even expose the
-  constructors to the messages to javascript via the above [@@bs.deriving {accessors}]
-  attribute on the `msg` type or manually, that way even javascript can use it safely. *)
 let main =
-  beginnerProgram { (* The beginnerProgram just takes a set model state and the update and view functions *)
-    model = init (); (* Since model is a set value here, we call our init function to generate that value *)
-    update;
-    view;
-  }
+  Navigation.navigationProgram locationChanged
+    { init
+    ; update
+    ; view
+    ; subscriptions = (fun _ -> Sub.none)
+    ; shutdown = (fun _ -> Cmd.none)
+    }
