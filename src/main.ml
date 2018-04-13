@@ -19,8 +19,8 @@ type msg =
   | Speaking of string
   | Dictation of string
   | LocationChanged of Web.Location.location
-  [@@bs.deriving accessors]
- 
+[@@bs.deriving accessors]
+
 let route_of_location location =
   let route = Js.String.split "/" location.Web.Location.hash in
   match route with
@@ -90,22 +90,22 @@ let routing_view model =
   let color_box_class color =
     let color_class color = "siimple-box--" ^ color in
     let class_from_list classes =
-        List.fold_left (fun a b -> a ^ " " ^ b) "" classes in
-    
+      List.fold_left (fun a b -> a ^ " " ^ b) "" classes in
+
     class_from_list ["siimple-box"; color_class color] in
   let title_with_route title view color =
     [div [class' @@ color_box_class color]
-         [div [class' "siimple-box-title"]
-              [text title]
-         ]
+       [div [class' "siimple-box-title"]
+          [text title]
+       ]
     ;div [class' "siimple-content"] [view]
     ] in
 
   let nodes = match model.route with
-           | Home -> title_with_route "home" home_view "grey"
-           | SpeakingQuiz -> title_with_route "speaking" speaking_view "pink"
-           | DictationQuiz -> title_with_route "dictation" dictation_view "green"
-           | Settings -> title_with_route "settings" settings_view "navy"
+    | Home -> title_with_route "home" home_view "grey"
+    | SpeakingQuiz -> title_with_route "speaking" speaking_view "pink"
+    | DictationQuiz -> title_with_route "dictation" dictation_view "green"
+    | Settings -> title_with_route "settings" settings_view "navy"
   in main [] nodes
 
 let view model =
