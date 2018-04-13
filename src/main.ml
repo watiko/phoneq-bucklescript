@@ -1,3 +1,5 @@
+[%%raw "import './style.scss'"]
+
 open Tea
 open Tea.Html
 

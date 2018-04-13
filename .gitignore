@@ -24,6 +24,7 @@ lib/
 .vscode
 node_modules
 release/main.js
+release/style.css
 .merlin
 .bsb.lock
 *.bs.js
