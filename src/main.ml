@@ -87,11 +87,25 @@ let settings_view =
 
 let routing_view model =
   let open! Html in
+  let color_box_class color =
+    let color_class color = "siimple-box--" ^ color in
+    let class_from_list classes =
+        List.fold_left (fun a b -> a ^ " " ^ b) "" classes in
+    
+    class_from_list ["siimple-box"; color_class color] in
+  let title_with_route title view color =
+    [div [class' @@ color_box_class color]
+         [div [class' "siimple-box-title"]
+              [text title]
+         ]
+    ;div [class' "siimple-content"] [view]
+    ] in
+
   let nodes = match model.route with
-           | Home -> [text "home"; home_view]
-           | SpeakingQuiz -> [text "speaking"; speaking_view]
-           | DictationQuiz -> [text "dictation"; dictation_view]
-           | Settings -> [text "settings"; settings_view]
+           | Home -> title_with_route "home" home_view "grey"
+           | SpeakingQuiz -> title_with_route "speaking" speaking_view "pink"
+           | DictationQuiz -> title_with_route "dictation" dictation_view "green"
+           | Settings -> title_with_route "settings" settings_view "navy"
   in main [] nodes
 
 let view model =
