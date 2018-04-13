@@ -36,8 +36,6 @@ let location_of_route = function
   | DictationQuiz -> "#!/dictation-quiz"
   | Settings      -> "#!/settings"
 
-external alert : (string -> unit) = "alert" [@@bs.val]
-
 let init_model =
   { route = Home
   ; speaking = None
