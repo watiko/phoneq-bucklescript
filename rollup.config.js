@@ -4,6 +4,7 @@ import livereload from 'rollup-plugin-livereload';
 export default {
     input: './src/Main.bs.js',
     output: {
+        name: 'phoneqBucklescript',
         file: './release/main.js',
         format: 'iife'
     },
@@ -11,7 +12,6 @@ export default {
         node_resolve({module: true, browser: true}),
         livereload('release')
     ],
-    name: 'starter',
     watch: {
         clearScreen: false
     }
