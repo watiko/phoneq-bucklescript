@@ -15,17 +15,17 @@ This is a starter kit for bucklescript with [tea](https://github.com/OvermindDL1
 ## Install
 
 ```
-npm install
+yarn install
 ```
 
 ## Build
 
 ```
-npm run build
+yarn run build
 ```
 
 ## Watch
 
 ```
-npm run watch
+yarn run watch
 ```
