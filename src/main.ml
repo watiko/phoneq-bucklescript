@@ -9,9 +9,13 @@ type route =
 
 type model =
   { route: route
+  ; speaking: string option
+  ; dictation: string option
   }
 
 type msg =
+  | Speaking of string
+  | Dictation of string
   | LocationChanged of Web.Location.location
   [@@bs.deriving accessors]
  
@@ -34,6 +38,8 @@ external alert : (string -> unit) = "alert" [@@bs.val]
 
 let init_model =
   { route = Home
+  ; speaking = None
+  ; dictation = None
   }
 
 let update_route model = function
@@ -41,17 +47,12 @@ let update_route model = function
   | route -> model, location_of_route route |> Navigation.newUrl
 
 let update model = function
+  | Speaking msg -> { model with speaking = Some msg}, Cmd.none
+  | Dictation msg -> { model with dictation = Some msg}, Cmd.none
   | LocationChanged l -> { model with route = route_of_location l }, Cmd.none
 
 let init () location =
   route_of_location location |> update_route init_model
-
-let view_button title msg =
-  button
-    [ onClick msg
-    ]
-    [ text title
-    ]
 
 let home_link = a [href "#!/"] [text "Home"]
 let speaking_link = a [href "#!/speaking-quiz"] [text "Speking Quiz"]
@@ -70,11 +71,15 @@ let home_view =
 
 let speaking_view =
   let open! Html in
-  home_link
+  div [] [ home_link
+         ; input' [type' "text"; onChange speaking] []
+         ]
 
 let dictation_view =
   let open! Html in
-  home_link
+  div [] [ home_link
+         ; input' [type' "text"; onChange dictation] []
+         ]
 
 let settings_view =
   let open! Html in
