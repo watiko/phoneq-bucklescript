@@ -1,6 +1,6 @@
 {
-  "name": "bucklescript-tea-starter-kit",
-  "version": "0.1.0",
+  "name": "phoneq-bucklescript",
+  "version": "0.0.1",
   "scripts": {
     "clean": "bsb -clean",
     "clean:all": "bsb -clean-world",
@@ -13,17 +13,13 @@
     "watch": "run-p watch:bsb watch:js serve",
     "start": "run-s watch"
   },
-  "keywords": [
-    "Bucklescript"
-  ],
-  "license": "MIT",
   "devDependencies": {
-    "bs-platform": "^2.1.0",
-    "bucklescript-tea": "^0.7.0",
+    "bs-platform": "^2.2.3",
+    "bucklescript-tea": "^0.7.2",
     "npm-run-all": "^4.1.2",
-    "rollup": "^0.52.1",
+    "rollup": "^0.57.1",
     "rollup-plugin-livereload": "^0.6.0",
-    "rollup-plugin-node-resolve": "^3.0.0",
-    "serve": "^6.4.1"
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "serve": "^6.5.5"
   }
 }
