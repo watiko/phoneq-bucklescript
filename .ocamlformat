@@ -1,0 +1,4 @@
+margin 90
+break-string-literals wrap
+sparse true
+version 0.4
