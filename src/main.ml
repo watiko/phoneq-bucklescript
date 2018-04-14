@@ -69,16 +69,22 @@ let home_view =
             ; item settings_link
             ]] 
 
-let speaking_view =
+let speaking_view model =
   let open! Html in
   div [] [ home_link
          ; input' [type' "text"; onChange speaking] []
+         ; text @@ match model.speaking with
+           | Some msg -> msg
+           | None -> "empty"
          ]
 
-let dictation_view =
+let dictation_view model =
   let open! Html in
   div [] [ home_link
          ; input' [type' "text"; onChange dictation] []
+         ; text @@ match model.dictation with
+           | Some msg -> msg
+           | None -> "empty"
          ]
 
 let settings_view =
@@ -103,8 +109,8 @@ let routing_view model =
 
   let nodes = match model.route with
     | Home -> title_with_route "home" home_view "grey"
-    | SpeakingQuiz -> title_with_route "speaking" speaking_view "pink"
-    | DictationQuiz -> title_with_route "dictation" dictation_view "green"
+    | SpeakingQuiz -> title_with_route "speaking" (speaking_view model) "pink"
+    | DictationQuiz -> title_with_route "dictation" (dictation_view model) "green"
     | Settings -> title_with_route "settings" settings_view "navy"
   in main [] nodes
 
