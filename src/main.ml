@@ -2,7 +2,6 @@
 "import './style.scss'"]
 
 open Tea
-open Tea.Html
 
 type route = Home | SpeakingQuiz | DictationQuiz | Settings
 
@@ -60,39 +59,6 @@ let update model = function
 
 let init () location = route_of_location location |> update_route init_model
 
-let home_link = a [href "#!/"] [text "Home"]
-
-let speaking_link = a [href "#!/speaking-quiz"] [text "Speking Quiz"]
-
-let dictation_link = a [href "#!/dictation-quiz"] [text "Dictation Quiz"]
-
-let settings_link = a [href "#!/settings"] [text "Settings"]
-
-let home_view =
-  let open! Html in
-  let item link = li [] [link] in
-  nav []
-    [ul [] [item home_link; item speaking_link; item dictation_link; item settings_link]]
-
-
-let speaking_view model =
-  let open! Html in
-  div []
-    [ home_link
-    ; input' [type' "text"; onChange speaking] []
-    ; (text @@ match model.speaking with Some msg -> msg | None -> "empty") ]
-
-
-let dictation_view model =
-  let open! Html in
-  div []
-    [ home_link
-    ; input' [type' "text"; onChange dictation] []
-    ; (text @@ match model.dictation with Some msg -> msg | None -> "empty") ]
-
-
-let settings_view = let open! Html in home_link
-
 let routing_view model =
   let open! Html in
   let color_box_class color =
@@ -107,15 +73,16 @@ let routing_view model =
     ; div [class' "siimple-content"] [view] ]
   in
   let nodes =
+    let open! View in
     match model.route with
     | Home ->
-        title_with_route "home" home_view "grey"
+        title_with_route "home" Home.view "grey"
     | SpeakingQuiz ->
-        title_with_route "speaking" (speaking_view model) "pink"
+        title_with_route "speaking" (Speaking.view model) "pink"
     | DictationQuiz ->
-        title_with_route "dictation" (dictation_view model) "green"
+        title_with_route "dictation" (Dictation.view model) "green"
     | Settings ->
-        title_with_route "settings" settings_view "navy"
+        title_with_route "settings" (Settings.view model) "navy"
   in
   main [] nodes
 
